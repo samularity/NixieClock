@@ -5,6 +5,6 @@ There will be a optional esp8266 to get the time from the internet.
 
 There will be three types of Modules
 - HV Supply Module (contains max1771 stepup for generating)
-- Controller Module
-- Nixie Module
+- Controller Module (contains Atmega32u4, ESP8266 and RTC)
+- Nixie Module (Contains 2 Nixies and two Attiny2313)
 
