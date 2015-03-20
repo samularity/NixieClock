@@ -1,10 +1,9 @@
 # NixieClock
 We (exco, kist, makefu and me) try to create a modular opensource nixie clock
-The clock is based on a atmega32u4, there will be a rtc chip for good time accuray
-There will be a optional esp8266 to get the time from the internet.
+The clock is based on a atmega32u4 esp8266 , there will be optional i²c rtc chip for good time accuray.
 
 There will be three types of Modules
-- HV Supply Module (contains max1771 stepup for generating)
-- Controller Module (contains Atmega32u4, ESP8266 and RTC)
-- Nixie Module (Contains 2 Nixies and two Attiny2313)
+- HV Supply Module (contains max1771 stepup for generating Tube supply voltage)
+- Controller Module (contains ESP8266 and RTC)
+- Nixie Module (Contains 2 Nixies and two Attiny2313 i²c slaves)
 
