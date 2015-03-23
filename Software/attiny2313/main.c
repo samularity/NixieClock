@@ -71,11 +71,11 @@ int main(void) {
 	PORTD = 0x00; //all pins
 
 	//set gpios as input to generate i²c adress offset
-	DDRB  &=~( (1<<PB0) | (1<<PB1) | (1<<PB2) | (1<<PB3) );//set direction
-	PORTB |= ( (1<<PB0) | (1<<PB1) | (1<<PB2) | (1<<PB3) );//activate pullup
+	DDRB  &=~( (1<<PB0) | (1<<PB1) | (1<<PB2) );//set direction
+	PORTB |= ( (1<<PB0) | (1<<PB1) | (1<<PB2) );//activate pullup
 	sleep_us(10);//wait for pullup
-	uint8_t _offset = PINB & ( (1<<PB0)|(1<<PB1)|(1<<PB2)|(1<<PB3) );//read pb0 pb1 pb2 pb3
-	_offset = 0xF & (~_offset);//calculate offset
+	uint8_t _offset = PINB & ( (1<<PB0)|(1<<PB1)|(1<<PB2) );//read pb0 pb1 pb2 pb3
+	_offset = 0x7 & (~_offset);//calculate offset
 	_DeviceAdress += _offset; //add offset to base adress
 	USI_init(); //init i²c
 	sleep_us(10);//just wait for all the registers to be set
