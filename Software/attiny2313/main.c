@@ -48,6 +48,7 @@ i²c start adress is defined below
 #define PORT_USI_SCL        PORTB7
 
 volatile uint8_t COMM_STATUS = NONE;
+void sleep_us(uint16_t us);
 void sleep_ms(uint16_t ms);
 void USI_init(void);
 
@@ -72,12 +73,12 @@ int main(void) {
 	//set gpios as input to generate i²c adress offset
 	DDRB  &=~( (1<<PB0) | (1<<PB1) | (1<<PB2) | (1<<PB3) );//set direction
 	PORTB |= ( (1<<PB0) | (1<<PB1) | (1<<PB2) | (1<<PB3) );//activate pullup
-
+	sleep_us(10);//wait for pullup
 	uint8_t _offset = PINB & ( (1<<PB0)|(1<<PB1)|(1<<PB2)|(1<<PB3) );//read pb0 pb1 pb2 pb3
 	_offset = 0xF & (~_offset);//calculate offset
 	_DeviceAdress += _offset; //add offset to base adress
-	
 	USI_init(); //init i²c
+	sleep_us(10);//just wait for all the registers to be set
 	sei(); //enable interrupts
 
 	while(1){
@@ -191,3 +192,11 @@ void sleep_ms(uint16_t ms){
 		_delay_ms(1);
 	}
 }
+
+void sleep_us(uint16_t us){
+	while(us){
+		us--;
+		_delay_us(1);
+	}
+}
+
