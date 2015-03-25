@@ -1,38 +1,62 @@
 /*
-Attiny2313 used as GPIO-Port expander
-Communication over I²C, attiny acts as slave
-Pinout:
-(1)		reset- mit pullup auf vcc
-(2-9) 	GPIO - frei 8x
-(10) 	GND	 -
-(11-16)	GPIO -frei 6x
-(17) 	PB5  - SDA
-(18) 	GPIO - frei
-(19)	PB7  - SCL
-(20)	VCC  - 3v3
-
-3 Pins as Input Pullup activated, used to select i²c adress offset
-i²c start adress is defined below
-3 Pins -> max 8 adress
-4 pins -> max 16 adress
-*/
-/*
 *************************************************************************************************
-* attiny2313 I²C Slave using USI                               
-* Samuel Munz
-* based on http://www.mikrocontroller.net/attachment/highlight/12871                      
+*
+* 	attiny2313 GPIO-Portexpander I²C Slave using USI                               
+* 	based on http://www.mikrocontroller.net/attachment/highlight/12871                      
+*	Samuel Munz - samuelmunz@gmx.de
+* 
 **************************************************************************************************
+
+runs on 8 Mhz internal oscillator
+Fuse settings (make wrfuse8mhz):
+H Fuse: 0xDF
+L Fuse: 0xE4
+E Fuse: 0xFF
+
+i²c base adress can be selected in #define USI_ADDRESS below, 
+the offset from the base can be selected by connecting PB0 PB1 and PB2 to GBD
+PB0 adds addr+1
+PB1 adds addr+2
+PB1 adds addr+4 
+
+
+Pinout:
+
+(1)		reset	
+(2)		PD0		nixie 6
+(3)		PD1		nixie 5
+(4)		PA1		nixie 8
+(5)		PA0		nixie 7
+(6)		PD2		nixie 4
+(7)		PD3		nixie 3
+(8)		PD4		nixie 2
+(9)		PD5		nixie 1
+(10)	GND
+(11)	PD6		nixie 0
+(12)	PB0		I²C ADDR Bit 0
+(13)	PB1		I²C ADDR Bit 1
+(14)	PB2		I²C ADDR Bit 2
+(15)	PB3		-nc-
+(16)	PB4		-nc-
+(17)	PB5		SDA
+(18)	PB6		nixie 9
+(19)	PB7		SCK
+(20)	Vcc		3v3
+
 */
+
 
 #include <avr/io.h>
 #include <avr/interrupt.h>
 #define F_CPU 8000000UL  // 8 MHz
 #include <util/delay.h>
 
+//edit i²c base adress here
+#define USI_ADDRESS			0x20
+
 #define USI_DATA   			USIDR
 #define USI_STATUS  		USISR
 #define USI_CONTROL 		USICR
-#define USI_ADDRESS			0x20
 
 #define NONE				0
 #define ACK_PR_RX			1
@@ -52,13 +76,11 @@ void sleep_us(uint16_t us);
 void sleep_ms(uint16_t ms);
 void USI_init(void);
 
-#define toggle(s) 		PORTD^=(1<<s);	//toggelt einen pin
 #define	SET_HIGH(s)		PORTD |= (1<<s);	//PD high
 #define SET_LOW(s)		PORTD &= ~(1<<s);	//PD low
 
 volatile uint8_t _DeviceAdress=USI_ADDRESS;
 volatile uint8_t _ReceivedByte=0;
-
 
 int main(void) {
 
@@ -121,7 +143,7 @@ void USI_init(void) {
 	USI_CONTROL |= (1<<USISIE);
 }
 
-ISR(USI_START_vect) {//ISR(SIG_USI_START) {
+ISR(USI_START_vect) {
 	//uncomment two lines below if its broken
 	//uint8_t tmpUSI_STATUS;
 	//tmpUSI_STATUS = USI_STATUS;
@@ -199,4 +221,3 @@ void sleep_us(uint16_t us){
 		_delay_us(1);
 	}
 }
-
