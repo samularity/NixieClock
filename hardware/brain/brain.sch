@@ -7587,11 +7587,12 @@ Source: 008-0260-0_E.pdf</description>
 <wire x1="53.34" y1="27.94" x2="58.42" y2="27.94" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="N$3" class="0">
+<net name="BOOTMODE" class="0">
 <segment>
 <pinref part="IC2" gate="G$1" pin="GPIO0"/>
 <pinref part="R5" gate="G$1" pin="1"/>
 <wire x1="53.34" y1="33.02" x2="68.58" y2="33.02" width="0.1524" layer="91"/>
+<label x="63.5" y="33.02" size="1.778" layer="95" rot="R90"/>
 </segment>
 </net>
 <net name="5V" class="0">
