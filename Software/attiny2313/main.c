@@ -3,7 +3,7 @@
 *
 * 	attiny2313 GPIO-Portexpander I²C Slave using USI                               
 * 	based on http://www.mikrocontroller.net/attachment/highlight/12871                      
-*	Samuel Munz - samuelmunz@gmx.de
+*	Samuel Munz 
 * 
 **************************************************************************************************
 
@@ -32,15 +32,16 @@ Pinout:
 (8)		PD4		nixie 2
 (9)		PD5		nixie 1
 (10)	GND
+
 (11)	PD6		nixie 0
 (12)	PB0		I²C ADDR Bit 0
 (13)	PB1		I²C ADDR Bit 1
 (14)	PB2		I²C ADDR Bit 2
 (15)	PB3		-nc-
 (16)	PB4		-nc-
-(17)	PB5		SDA
-(18)	PB6		nixie 9
-(19)	PB7		SCK
+(17)	PB5		SDA     | ISP-MOSI
+(18)	PB6		nixie 9 | ISP-MISO
+(19)	PB7		SCK     | ISP-SCK
 (20)	Vcc		3v3
 
 */
@@ -52,7 +53,7 @@ Pinout:
 #include <util/delay.h>
 
 //edit i²c base adress here
-#define USI_ADDRESS			0x20
+#define USI_ADDRESS			0x10 //max 0x10 + 7
 
 #define USI_DATA   			USIDR
 #define USI_STATUS  		USISR
@@ -79,7 +80,7 @@ void USI_init(void);
 #define	SET_HIGH(s)		PORTD |= (1<<s);	//PD high
 #define SET_LOW(s)		PORTD &= ~(1<<s);	//PD low
 
-volatile uint8_t _DeviceAdress=USI_ADDRESS;
+volatile uint8_t _DeviceAdress = USI_ADDRESS;
 volatile uint8_t _ReceivedByte=0;
 
 int main(void) {
@@ -101,31 +102,37 @@ int main(void) {
 	_DeviceAdress += _offset; //add offset to base adress
 	USI_init(); //init i²c
 	sleep_us(10);//just wait for all the registers to be set
+	
 	sei(); //enable interrupts
 
+    _ReceivedByte=0x00;
 	while(1){
 		//all off
-		PORTA &= ~( (1<<PA0) | (1<<PA1)) ;
-		PORTD = 0x00;
+		PORTA &= ~( /*(1<<PA0) |*/ (1<<PA1));PORTD = 0x00;
+
 		
 		//check _ReceivedByte and set the choosen
-		switch(_ReceivedByte)
+		switch(_ReceivedByte & 0b00001111)
 		{
 			case 0: PORTD |= (1<<0); break; //number 0
 			case 1: PORTD |= (1<<1); break;
 			case 2: PORTA |= (1<<1); break;
-			case 3: PORTA |= (1<<0); break;
+			case 3: /*PORTA |= (1<<0);*/ break;
 			case 4: PORTD |= (1<<2); break;
 			case 5: PORTD |= (1<<3); break;
 			case 6: PORTD |= (1<<4); break;
-			case 7: PORTD |= (1<<5); break;
+			case 7: 
 			case 8:
 			case 9:
-			case 10: //to number 10
-			case 11: //upper point
-			case 12: //lower point
 			default: break;	//none - all off
 		}
+        
+        switch(_ReceivedByte & 0b00010000) //enable or disable dot
+		{
+			case 0b00010000: PORTA |= (1<<0); break; //dot on
+            default: PORTA &= ~ (1<<PA0); break;	//dot off
+        }
+        
 		sleep_ms(10);//wait a little
 	}
 	return 0;
@@ -147,7 +154,7 @@ ISR(USI_START_vect) {
 	//uncomment two lines below if its broken
 	//uint8_t tmpUSI_STATUS;
 	//tmpUSI_STATUS = USI_STATUS;
-	//COMM_STATUS = NONE;
+	COMM_STATUS = NONE;
 	// Wait for SCL to go low to ensure the "Start Condition" has completed.
 	// otherwise the counter will count the transition
 	while ( (PIN_USI & (1<<PORT_USI_SCL)) );

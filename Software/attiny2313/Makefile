@@ -44,6 +44,7 @@ help:
 #==========================
 main.hex : main.out 
 	$(OBJCOPY) -R .eeprom -O ihex main.out main.hex 
+	rm -f *.o *.map *.out
 main.out : main.o 
 	$(CC) $(CFLAGS) -o main.out -Wl,-Map,main.map main.o 
 main.o : main.c 
