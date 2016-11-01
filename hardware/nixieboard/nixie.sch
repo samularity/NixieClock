@@ -9262,7 +9262,7 @@ W = angled&lt;p&gt;
 </deviceset>
 </devicesets>
 </library>
-<library name="buzzer">
+<library name="ins1">
 <description>&lt;b&gt;Speakers and Buzzers&lt;/b&gt;&lt;p&gt;
 &lt;ul&gt;Distributors:
 &lt;li&gt;Buerklin
@@ -9273,14 +9273,13 @@ W = angled&lt;p&gt;
 <packages>
 <package name="F/CM12P">
 <description>&lt;b&gt;BUZZER&lt;/b&gt;</description>
-<wire x1="3.175" y1="3.048" x2="4.445" y2="3.048" width="0.254" layer="21"/>
-<wire x1="3.81" y1="3.683" x2="3.81" y2="2.413" width="0.254" layer="21"/>
-<circle x="0" y="0" radius="6.985" width="0.1524" layer="21"/>
+<wire x1="1.905" y1="1.778" x2="3.175" y2="1.778" width="0.254" layer="21"/>
+<wire x1="2.54" y1="2.413" x2="2.54" y2="1.143" width="0.254" layer="21"/>
+<circle x="0" y="0" radius="5.08" width="0.1524" layer="21"/>
 <circle x="0" y="0" radius="1.27" width="0.1524" layer="21"/>
-<circle x="3.81" y="3.048" radius="1.27" width="0.1524" layer="21"/>
 <pad name="-" x="-3.81" y="0" drill="1.016" diameter="2.54" shape="octagon"/>
 <pad name="+" x="3.81" y="0" drill="1.016" diameter="2.54" shape="octagon"/>
-<text x="2.54" y="6.985" size="1.27" layer="25" ratio="10">&gt;NAME</text>
+<text x="-2.54" y="5.715" size="1.27" layer="25" ratio="10">&gt;NAME</text>
 <text x="-4.445" y="-3.81" size="1.27" layer="27" ratio="10">&gt;VALUE</text>
 </package>
 </packages>
@@ -9442,8 +9441,8 @@ W = angled&lt;p&gt;
 <part name="SJ6" library="jumper" deviceset="SJ" device=""/>
 <part name="SV3" library="con-lstb" deviceset="MA03-2" device=""/>
 <part name="SV4" library="con-lstb" deviceset="MA03-2" device=""/>
-<part name="SG1" library="buzzer" deviceset="F/CM12P" device=""/>
-<part name="SG2" library="buzzer" deviceset="F/CM12P" device=""/>
+<part name="SG1" library="ins1" deviceset="F/CM12P" device=""/>
+<part name="SG2" library="ins1" deviceset="F/CM12P" device=""/>
 <part name="R25" library="resistor" deviceset="R-EU_" device="R0805"/>
 <part name="R26" library="resistor" deviceset="R-EU_" device="R0805"/>
 <part name="T21" library="transistor" deviceset="*-NPN-" device="SOT23-BEC" technology="MMBTA42LT1"/>
