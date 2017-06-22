@@ -14,34 +14,34 @@ L Fuse: 0xE4
 E Fuse: 0xFF
 
 i²c base adress can be selected in #define USI_ADDRESS below, 
-the offset from the base can be selected by connecting PB0 PB1 and PB2 to GBD
+the offset from the base can be selected by connecting PB0 PB1 and PB2 to GND
 PB0 adds addr+1
 PB1 adds addr+2
-PB1 adds addr+4 
+PB2 adds addr+4 
 
 
 Pinout:
 
 (1)		reset	
-(2)		PD0		nixie 6
-(3)		PD1		nixie 5
-(4)		PA1		nixie 8
-(5)		PA0		nixie 7
-(6)		PD2		nixie 4
-(7)		PD3		nixie 3
-(8)		PD4		nixie 2
-(9)		PD5		nixie 1
+(2)		PD0		k6	nixie 6
+(3)		PD1		k5	nixie 5
+(4)		PA1		k8	nixie 8
+(5)		PA0		k7	nixie 7
+(6)		PD2		k4	nixie 4
+(7)		PD3		k3	nixie 3
+(8)		PD4		k2	nixie 2
+(9)		PD5		k1	nixie 1
 (10)	GND
 
-(11)	PD6		nixie 0
+(11)	PD6		k0	nixie 0
 (12)	PB0		I²C ADDR Bit 0
 (13)	PB1		I²C ADDR Bit 1
 (14)	PB2		I²C ADDR Bit 2
 (15)	PB3		-nc-
-(16)	PB4		-nc-
-(17)	PB5		SDA     | ISP-MOSI
-(18)	PB6		nixie 9 | ISP-MISO
-(19)	PB7		SCK     | ISP-SCK
+(16)	PB4		2x DOT
+(17)	PB5		SDA     		| ISP-MOSI
+(18)	PB6		k9	nixie 9 	| ISP-MISO
+(19)	PB7		SCK     		| ISP-SCK
 (20)	Vcc		3v3
 
 */
@@ -86,18 +86,18 @@ volatile uint8_t _ReceivedByte=0;
 int main(void) {
 
 	//set gpios as output
-	DDRA |= ( (1<<PA0) | (1<<PA1));// set as PortA as output
+	DDRA |= ( (1<<0) | (1<<1));// set as PortA as output
 	DDRD = 0xFF;  // set as PortD as output
-
+	DDRB |= (1<<4);
 	//Set choosen outputs low
-	PORTA &= ~( (1<<PA0) | (1<<PA1)) ;//just 0 and 1
+	PORTA &= ~( (1<<0) | (1<<1)) ;//just 0 and 1
 	PORTD = 0x00; //all pins
 
 	//set gpios as input to generate i²c adress offset
-	DDRB  &=~( (1<<PB0) | (1<<PB1) | (1<<PB2) );//set direction
-	PORTB |= ( (1<<PB0) | (1<<PB1) | (1<<PB2) );//activate pullup
+	DDRB  &=~( (1<<0) | (1<<1) | (1<<2) );//set direction
+	PORTB |= ( (1<<0) | (1<<1) | (1<<2) );//activate pullup
 	sleep_us(10);//wait for pullup
-	uint8_t _offset = PINB & ( (1<<PB0)|(1<<PB1)|(1<<PB2) );//read pb0 pb1 pb2 pb3
+	uint8_t _offset = PINB & ( (1<<0)|(1<<1)|(1<<2) );//read pb0 pb1 pb2 pb3
 	_offset = 0x7 & (~_offset);//calculate offset
 	_DeviceAdress += _offset; //add offset to base adress
 	USI_init(); //init i²c
@@ -110,27 +110,26 @@ int main(void) {
 		//all off
 		PORTA &= ~( /*(1<<PA0) |*/ (1<<PA1));PORTD = 0x00;
 
-		
 		//check _ReceivedByte and set the choosen
 		switch(_ReceivedByte & 0b00001111)
 		{
-			case 0: PORTD |= (1<<0); break; //number 0
-			case 1: PORTD |= (1<<1); break;
-			case 2: PORTA |= (1<<1); break;
-			case 3: /*PORTA |= (1<<0);*/ break;
+			case 0: PORTD |= (1<<6); break; //number 0
+			case 1: PORTD |= (1<<5); break;
+			case 2: PORTD |= (1<<4); break;
+			case 3: PORTD |= (1<<3); break;
 			case 4: PORTD |= (1<<2); break;
-			case 5: PORTD |= (1<<3); break;
-			case 6: PORTD |= (1<<4); break;
-			case 7: 
-			case 8:
-			case 9:
+			case 5: PORTD |= (1<<1); break;
+			case 6: PORTD |= (1<<0); break;
+			case 7: PORTA |= (1<<0); break;
+			case 8: PORTA |= (1<<1); break;
+			case 9: PORTB |= (1<<6); break;
 			default: break;	//none - all off
 		}
         
         switch(_ReceivedByte & 0b00010000) //enable or disable dot
 		{
-			case 0b00010000: PORTA |= (1<<0); break; //dot on
-            default: PORTA &= ~ (1<<PA0); break;	//dot off
+			case 0b00010000: PORTB |= (1<<4); break; //dot on
+            default: PORTB &= ~ (1<<4); break;	//dot off
         }
         
 		sleep_ms(10);//wait a little
