@@ -8,5 +8,5 @@ There will be three types of Modules
 - Nixie Module (Contains 2 Nixies and two Attiny2313 i²c slaves)
 
 maybe you find some additional information here
-https://gum.krebsco.de/wiki/samu.html#nixie
+https://wiki.euer.krebsco.de/samu.html#nixie
 https://excogitation.de/wiki/#IN-12A%20nixie%20clock
