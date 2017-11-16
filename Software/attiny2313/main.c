@@ -21,26 +21,39 @@ PB2 adds addr+4
 
 
 Pinout:
+Nixie	Pin
+0		PA0
+1		PD0
+2		PD1
+3		PD2
+4		PD3
+5		PD4
+6		PD5
+7		PD6
+8		PB6
+9		PA1
+Dot		PB4
+ 
 
 (1)		reset	
-(2)		PD0		k6	nixie 6
-(3)		PD1		k5	nixie 5
-(4)		PA1		k8	nixie 8
-(5)		PA0		k7	nixie 7
-(6)		PD2		k4	nixie 4
-(7)		PD3		k3	nixie 3
-(8)		PD4		k2	nixie 2
-(9)		PD5		k1	nixie 1
+(2)		PD0		Nixie 1
+(3)		PD1		Nixie 2
+(4)		PA1		Nixie 9
+(5)		PA0		Nixie 0
+(6)		PD2		Nixie 3
+(7)		PD3		Nixie 4
+(8)		PD4		Nixie 5
+(9)		PD5		Nixie 6
 (10)	GND
 
-(11)	PD6		k0	nixie 0
+(11)	PD6		Nixie 7
 (12)	PB0		I²C ADDR Bit 0
 (13)	PB1		I²C ADDR Bit 1
 (14)	PB2		I²C ADDR Bit 2
-(15)	PB3		-nc-
-(16)	PB4		2x DOT
+(15)	PB3		
+(16)	PB4		Nixie Dot
 (17)	PB5		SDA     		| ISP-MOSI
-(18)	PB6		k9	nixie 9 	| ISP-MISO
+(18)	PB6		Nixie 8		 	| ISP-MISO
 (19)	PB7		SCK     		| ISP-SCK
 (20)	Vcc		3v3
 
@@ -108,30 +121,36 @@ int main(void) {
     _ReceivedByte=0x00;
 	while(1){
 		//all off
-		PORTA &= ~( /*(1<<PA0) |*/ (1<<PA1));PORTD = 0x00;
+		PORTA &= ~( (1<<PA0) | (1<<PA1) );
+		PORTB &= ~( (1<<PB4) | (1<<PB6) );
+		PORTD = 0x00;
 
 		//check _ReceivedByte and set the choosen
 		switch(_ReceivedByte & 0b00001111)
 		{
-			case 0: PORTD |= (1<<6); break; //number 0
-			case 1: PORTD |= (1<<5); break;
-			case 2: PORTD |= (1<<4); break;
-			case 3: PORTD |= (1<<3); break;
-			case 4: PORTD |= (1<<2); break;
-			case 5: PORTD |= (1<<1); break;
-			case 6: PORTD |= (1<<0); break;
-			case 7: PORTA |= (1<<0); break;
-			case 8: PORTA |= (1<<1); break;
-			case 9: PORTB |= (1<<6); break;
+			case 0: PORTA |= (1<<0); break; //number 0
+			case 1: PORTD |= (1<<0); break;
+			case 2: PORTD |= (1<<1); break;
+			case 3: PORTD |= (1<<2); break;
+			case 4: PORTD |= (1<<3); break;
+			case 5: PORTD |= (1<<4); break;
+			case 6: PORTD |= (1<<5); break;
+			case 7: PORTD |= (1<<6); break;
+			case 8: PORTB |= (1<<6); break;
+			case 9: PORTA |= (1<<1); break;
 			default: break;	//none - all off
 		}
-        
+		if ( 0b00010000 == (_ReceivedByte & 0b00010000) )
+		{
+			PORTB |= (1<<4);
+		}
+/*        
         switch(_ReceivedByte & 0b00010000) //enable or disable dot
 		{
 			case 0b00010000: PORTB |= (1<<4); break; //dot on
             default: PORTB &= ~ (1<<4); break;	//dot off
         }
-        
+*/        
 		sleep_ms(10);//wait a little
 	}
 	return 0;
