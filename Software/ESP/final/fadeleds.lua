@@ -1,9 +1,8 @@
-numled = 4
+numled = 6
 
 
 ws2812.init(ws2812.MODE_SINGLE)
 -- create a buffer, 60 LEDs with 3 color bytes
--- 4 LEDS
 strip_buffer = ws2812.newBuffer(numled, 3)
 -- init the effects module, set color to red and start blinking
 

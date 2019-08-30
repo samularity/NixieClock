@@ -9,6 +9,8 @@ local seconds = 0
 local refresh_delay = 1000
 local id = 0
 local disp = nil
+-- let the LEDs in the middle blink each second
+local blink = false
 
 -- we retrieve our current timezone offset
 -- local ntpserver = "time.nist.gov"
@@ -33,7 +35,10 @@ local function sync_time()
   print("syncing time")
   sntp.sync(ntpserver, function ()
     local tm = rtctime.epoch2cal(rtctime.get())
-    print(string.format("%04d/%02d/%02d %02d:%02d:%02d", tm["year"], tm["mon"], tm["day"], tm["hour"], tm["min"], tm["sec"]))
+    print(string.format("UTC: %04d/%02d/%02d %02d:%02d:%02d", tm["year"], tm["mon"], tm["day"], tm["hour"], tm["min"], tm["sec"]))
+  end, function (err)
+    print("Sync failed "..err .." , retrying in 5s")
+    tmr.create():alarm(5000, tmr.ALARM_SINGLE, sync_time)
   end)
 end
 
@@ -59,6 +64,7 @@ local function refresh_data()
   local tm = rtctime.epoch2cal(rtctime.get() + (3600 * tz))
 
   hour,min,seconds = tm["hour"],tm["min"],tm["sec"]
+  --print(string.format("it is %02d:%02d:%02d",hour,min,seconds))
 
 end
 
@@ -71,9 +77,11 @@ local function refresh_nixie()
   for i = 1, #r do
   -- for i = 1, 1 do
     local c = string.byte(r:sub(i,i)) - 48 -- - "0"
-    if seconds %2 == 0 then
+
+    if blink and (seconds %2 == 0) then
       c = c + 0x10
     end
+
     -- local i_addr = i
     -- first part Seconds = 0x10
     -- second part Seconds = 0x11
@@ -81,6 +89,7 @@ local function refresh_nixie()
 
     local i_addr = 0x0F + i
     write_ic(i_addr,c)
+    -- print(string.format('writing to %x -> %x',i_addr,c))
     -- tmr.delay(50000)
   end
 
@@ -104,4 +113,4 @@ local function schedule(tid,t2id)
 end
 
 
-return {init_display=init_display,init_nixie=init_nixie,sync=sync_time,show=show,schedule=schedule}
+return {write_ic=write_ic,init_display=init_display,init_nixie=init_nixie,sync=sync_time,show=show,schedule=schedule}
